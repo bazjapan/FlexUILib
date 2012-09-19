@@ -25,6 +25,11 @@
 			[Inspectable(defaultValue='5', category="Other", enumeration="1,5,10,15,30")] 
 			public var minuteIncrement:int = 5;
 			
+			[Bindable]
+			public var show_time:Boolean = true;
+			[Bindable]
+			public var show_date:Boolean = true;
+				
 			
 			public function get selectedDate():Date
 			{
@@ -35,6 +40,10 @@
 			[Bindable]
 			public function set selectedDate(value:Date):void
 			{
+			if(!show_time){
+					value.setHours(0,0,0,0);
+					
+			}	
 			this._selectedDate = value
 			this.date.selectedDate = this._selectedDate
 			if(value.getHours() >= 12)
@@ -79,7 +88,7 @@
 			selDate.getDate(),
 			militaryHours,
 			minutes.value)
-			this.selectedDate = date;
+			this._selectedDate = date;
 			
 			this.invalidateProperties();
 			this.validateNow();
@@ -88,16 +97,18 @@
 			}
 			]]>
 		</fx:Script>
+	<s:HGroup width="100%" includeInLayout="{show_date}" visible="{show_date}">
 		<mx:DateField id="date" selectedDate="{new Date()}" change="handleChange()"/>
 		<s:Spacer width="20"/>
-		<s:NumericStepper id="hours" minimum="1" maximum="12" stepSize="1" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+	</s:HGroup>
+		<s:HGroup width="100%" includeInLayout="{show_time}"  visible="{show_time}">
+		<s:NumericStepper  id="hours" minimum="1" maximum="12" stepSize="1" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
 		<s:Label text=":" textAlign="center"/>
 		<s:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="{minuteIncrement}" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
 		<s:Spacer width="10"/>
-	
-	
 		<s:RadioButton id="am" value="1" label="AM" group="{ampm}"/>
 		<s:RadioButton id="pm" value="2" label="PM" group="{ampm}"/>
+		</s:HGroup>
 
 	
 </s:Group>

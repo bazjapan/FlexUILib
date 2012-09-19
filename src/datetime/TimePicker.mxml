@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RadioButtonGroup id="ampm" selectedValue="1" change="this.handleChange()"/>
+	</fx:Declarations>
+	<s:layout>
+		<s:HorizontalLayout>
+			
+		</s:HorizontalLayout>
+	</s:layout>
+	
+	<fx:Metadata>
+		[Event(name="change", type="flash.events.Event")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			
+
+			
+			[Bindable] 
+			[Inspectable(defaultValue='5', category="Other", enumeration="1,5,10,15,30")] 
+			public var minuteIncrement:int = 5;
+			
+			[Bindable]
+			public var show_time:Boolean = true;
+	
+			private var _selectedTime:String;
+			
+			
+			public function get selectedTime():String
+			{
+				this.validateNow();
+				var militaryHours:int = hours.value;
+				if(ampm.selectedValue == 2 && hours.value != 12)
+					militaryHours = hours.value+12; 
+				else if(ampm.selectedValue == 1 && hours.value == 12)
+					militaryHours = 0;
+				
+				var hh:String = addLeadingZero(militaryHours);
+				var mm:String = addLeadingZero(minutes.value);
+				var ss:String = "00";
+				
+				this._selectedTime = [hh,mm,ss].join(":");
+				
+				return this._selectedTime;
+			}
+			
+			[Bindable]
+			public function set selectedTime(val:String):void
+			{
+				var split:Array = val.split(":");
+				var hh : int = int(split[0]);
+				var mm : int = int(split[1]);
+				var ss : int = int(split[2]);
+				
+				if(hh >= 12)
+				{
+					this.ampm.selectedValue = 2;
+				}
+				else
+				{
+					this.ampm.selectedValue = 1;
+				}
+				if(hh < 13 )
+					this.hours.value = hh
+				else
+					this.hours.value = hh - 12
+				
+				if(hh == 0)
+					this.hours.value = 12;
+				
+				this.minutes.value = mm;
+				
+				this.validateNow();
+			}
+			
+			override public function validateProperties():void
+			{
+				super.validateProperties();
+				
+			}
+			
+			public function handleChange():void
+			{
+				this.dispatchEvent(new Event("change"));
+			}
+			
+			private function addLeadingZero(n:Number):String
+			{
+				var out:String = String(n);
+				
+				if (n < 10 && n > -1)
+				{
+					out = "0" + out;
+				}
+				
+				return out;
+			}
+		]]>
+	</fx:Script>
+
+		<s:NumericStepper  id="hours" minimum="1" maximum="12" stepSize="1" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+		<s:Label text=":" textAlign="center"/>
+		<s:NumericStepper id="minutes" minimum="0"  maximum="55" stepSize="{minuteIncrement}" change="handleChange()" valueCommit="handleChange()" textAlign="center"/>
+		<s:Spacer width="10"/>
+		<s:RadioButton id="am" value="1" label="AM" group="{ampm}"/>
+		<s:RadioButton id="pm" value="2" label="PM" group="{ampm}"/>
+
+	
+	
+</s:Group>
